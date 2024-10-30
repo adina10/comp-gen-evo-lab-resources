@@ -559,7 +559,7 @@ if(k == TIME){
 	ave_segtime_first = (double)segtime_first/(double)(REP);
 	ave_segtime_second = (double)segtime_second/(double)(REP);
 
-if( i == 299999 && hl_first_locus > 10000000.0 && hl_second_locus > 10000000.0){REP= 500000; break;} 
+if( i == 499999 && hl_first_locus > 10000000.0 && hl_second_locus > 10000000.0){REP= 500000; break;} 
 
 } // end REP
 
