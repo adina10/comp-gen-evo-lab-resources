@@ -3,8 +3,7 @@
 This repository contains:
 - Simulation code in C used in my senior thesis titled "Epistasis modulates balanced polymorphism in changing environments"
 - Example R code for one of my figures.
-- I will upload my shell script template for generating subdirectories and PBS script examples for running your own project on CARC.
-- Always feel free to ask any questions on this code or your own code!
+- Always feel free to ask any questions on this code or your own code.
 
 ## Descriptions
 
