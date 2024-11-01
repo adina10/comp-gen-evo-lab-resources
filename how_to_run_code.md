@@ -17,6 +17,6 @@
 5. Type in the password.
 6. Navigate to where your shell script is on the machine.
 7. Run your shell script by typing `sh myScriptName.sh`. Example shell scripts are in the repository.
-8. <u> How to transfer a copy of your folder with results to your laptop:</u>
-9. Once your code is done running, navigate to the directory where you want your results to be.
-10. Repeat steps 2-5, except replace "put" with "get"
+- How to transfer a copy of your folder with results to your laptop:
+8. Once your code is done running, navigate to the directory where you want your results to be.
+9. Repeat steps 2-5, except replace "put" with "get".
