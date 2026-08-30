@@ -1,0 +1,84 @@
+---
+title: "Parsing VEP Output to Classify cis vs. trans"
+output: html_notebook
+---
+
+Parsing VEP Output to Classify cis vs. trans in R
+Key Rule:
+    A cis variant is within ±500kb of the affected gene (may use 1Mb).
+    A trans variant is outside this window.
+
+Sample R script
+```{r}
+library(data.table)
+library(GenomicRanges)
+
+# Load VEP output
+vep <- fread("annotated.vep.txt", fill = TRUE)
+
+# Example columns: 'Location', 'SYMBOL', 'Feature_type', 'Consequence'
+# Extract chromosome and position
+vep[, c("chr", "pos") := tstrsplit(Location, ":", fixed = TRUE)]
+vep[, pos := as.integer(pos)]
+
+# Load GTF with gene coordinates (or use biomaRt)
+gtf <- fread("genes.gtf")  # Should contain gene name, chr, start, end
+setnames(gtf, c("gene", "chr", "start", "end"))
+
+# Merge and classify
+vep_annot <- merge(vep, gtf, by.x = "SYMBOL", by.y = "gene", all.x = TRUE)
+
+# Calculate distance to gene
+vep_annot[, distance := abs(pos - ((start + end) / 2))]
+
+# Classify
+vep_annot[, cis_trans := ifelse(distance <= 500000, "cis", "trans")]
+table(vep_annot$cis_trans)
+
+```
+
+
+
+Script to Annotate VEP Output with GTEx eQTLs
+GTEx Resources:
+    Download GTEx eQTL files from https://www.gtexportal.org/home/downloads/adult-gtex/qtl (e.g., GTEx_Analysis_v8_eQTL.tar or  GTEx_Analysis_v8_eQTL.tar or  *.signif_variant_gene_pairs.txt.gz)
+  
+  
+```{bash}
+# Download all GTEx v8 cis-eQTLs (around 1.6 GB compressed)
+wget https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/GTEx_Analysis_v8_eQTL.tar
+
+# Unpack the archive
+tar -xvf GTEx_Analysis_v8_eQTL.tar
+
+```
+
+
+Python Script: annotate_with_gtex.py
+
+```{python}
+
+import pandas as pd
+
+# Load VEP output (from --tab flag)
+vep = pd.read_csv("annotated.vep.txt", sep="\t", comment="#")
+
+# Parse VEP column 'Location' into CHR and POS
+vep[['CHR', 'POS']] = vep['Location'].str.split(":", expand=True)
+vep['POS'] = vep['POS'].astype(int)
+
+# Load GTEx eQTLs
+gtex = pd.read_csv("GTEx_Analysis_v10_eQTL/signif_variant_gene_pairs.txt.gz", sep="\t")
+gtex[['CHR', 'POS', 'REF', 'ALT']] = gtex['variant_id'].str.split('_', expand=True)
+gtex['POS'] = gtex['POS'].astype(int)
+
+# Join by CHR and POS
+merged = pd.merge(vep, gtex, on=["CHR", "POS"], how="left")
+
+# Save merged output
+merged.to_csv("vep_annotated_with_gtex.csv", index=False)
+
+```
+
+```
+
